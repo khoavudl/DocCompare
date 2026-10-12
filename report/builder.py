@@ -8,9 +8,11 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 from core.models import CompareResult
+from core.resources import get_resource_path
 
-TEMPLATE_DIR = Path(__file__).parent
-TEMPLATE_NAME = "template.html.j2"
+TEMPLATE_PATH = get_resource_path("report/template.html.j2")
+TEMPLATE_DIR = TEMPLATE_PATH.parent
+TEMPLATE_NAME = TEMPLATE_PATH.name
 
 
 def highlight_character_diffs(word_text: str, pdf_text: str) -> tuple[str, str]:

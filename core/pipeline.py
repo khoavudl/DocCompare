@@ -38,7 +38,12 @@ def calculate_sha256(filepath: str) -> str:
 
 def load_config(config_path: str) -> dict:
     """Loads YAML configuration file or returns defaults."""
-    path = Path(config_path)
+    from core.resources import get_resource_path
+
+    path = Path(config_path) if config_path else get_resource_path("config/filters.yaml")
+    if not path.is_file():
+        path = get_resource_path("config/filters.yaml")
+
     if path.is_file():
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -46,6 +51,7 @@ def load_config(config_path: str) -> dict:
         except Exception:
             pass
     return {}
+
 
 
 def validate_input_files(word_path: str, pdf_path: str) -> None:
