@@ -61,10 +61,12 @@ class MainWindow(ctk.CTk):
 
     def _load_logo_image(self) -> tk.PhotoImage | None:
         """Loads and scales Logo-fes.png with antialiasing using PyMuPDF."""
+        from core.resources import get_resource_path
+
         candidates = [
+            get_resource_path("Logo-fes.png"),
             Path("Logo-fes.png"),
             Path(__file__).resolve().parent.parent / "Logo-fes.png",
-            getattr(sys, "_MEIPASS", Path(".")) / "Logo-fes.png" if hasattr(sys, "_MEIPASS") else None,
         ]
         for p in candidates:
             if p and p.is_file():
@@ -79,6 +81,7 @@ class MainWindow(ctk.CTk):
                 except Exception:
                     pass
         return None
+
 
     def _build_ui(self) -> None:
         """Constructs widgets and layout."""
