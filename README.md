@@ -17,11 +17,20 @@
 
 Có 2 cách triển khai cho máy Windows:
 
-### 🌟 Cách 1: Đóng gói thành file `.exe` (Dành cho User không rành kỹ thuật)
+### 🌟 Cách 1: Tải file `.exe` đã đóng gói (Dành cho User không rành kỹ thuật)
 *User KHÔNG CẦN cài Python, KHÔNG CẦN gõ lệnh Terminal.*
 
-#### Bước 1: Build gói cài đặt trên máy có Python
-Chạy lệnh đóng gói PyInstaller:
+#### Cách A: Tự động tải từ GitHub Actions (Khuyến nghị - Không cần máy Windows để build)
+Dự án đã tích hợp sẵn GitHub Actions workflow tự động build trên máy ảo Windows của GitHub:
+1. Truy cập repo của anh trên GitHub: **[khoavudl/DocCompare](https://github.com/khoavudl/DocCompare)**.
+2. Vào tab **Actions** $\rightarrow$ chọn workflow **"Build Windows Application (.exe)"** ở cột trái.
+3. Bấm nút **Run workflow** $\rightarrow$ chọn branch `main` $\rightarrow$ bấm **Run workflow**.
+4. Chờ khoảng 2–3 phút cho GitHub build xong $\rightarrow$ click vào lượt chạy đó và cuộn xuống mục **Artifacts** $\rightarrow$ tải file **`DocCompare-windows-x64.zip`** về.
+5. Giải nén trên máy Windows của User, mở file **`DocCompare.exe`** là chạy ngay!
+*(Lưu ý: Máy user chỉ cần cài LibreOffice từ [libreoffice.org](https://www.libreoffice.org/download/download/) là xong)*.
+
+#### Cách B: Tự build thủ công trên máy Windows
+Nếu muốn tự build trên máy Windows cục bộ có Python:
 ```bash
 pip install pyinstaller
 pyinstaller --noconfirm --onedir --windowed ^
@@ -31,12 +40,8 @@ pyinstaller --noconfirm --onedir --windowed ^
   --add-data "Logo-fes.png;." ^
   app.py
 ```
-*(Thư mục đầu ra sẽ nằm tại `dist/DocCompare/`)*.
+*(Thư mục sau khi build nằm tại `dist/DocCompare/`, copy sang máy user và chạy `DocCompare.exe`)*.
 
-#### Bước 2: Chuyển giao cho User
-1. Cài đặt **LibreOffice** trên máy Windows của user.
-2. Copy toàn bộ thư mục `DocCompare` trong thư mục `dist` sang máy user (ví dụ đặt ở `C:\DocCompare` hoặc `Desktop`).
-3. User chỉ cần nhấp đúp chuột vào file **`DocCompare.exe`** để mở giao diện so sánh.
 
 ---
 
