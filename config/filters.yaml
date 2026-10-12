@@ -1,0 +1,53 @@
+diff:
+  context_tokens: 6
+  merge_gap_tokens: 2
+filters:
+  N10_reorder:
+    enabled: true
+  N11_empty:
+    enabled: true
+  N2_page_number:
+    enabled: true
+    patterns:
+    - ^\d{1,3}$
+    - ^(Trang|Page)\s*\d{1,3}$
+    - ^\d{1,3}\s*/\s*\d{1,3}$
+    - ^\d{1,3}\s+of\s+\d{1,3}$
+  N3_signature:
+    enabled: true
+    fallback_patterns:
+    - ^Digitally signed by
+    - '^Thời gian ký:'
+    - ^Date:\s*\d{2}/\d{2}/\d{4}
+    margin_pt: 10
+  N4_header_footer:
+    enabled: true
+    min_page_ratio: 0.6
+    min_pages: 3
+    y_tolerance_pt: 5
+  N5_unicode:
+    enabled: true
+  N6_whitespace:
+    enabled: true
+    join_hyphenated: true
+  N8_char_map:
+    enabled: true
+    map:
+       : ' '
+      –: '-'
+      —: '-'
+      ‘: ''''
+      ’: ''''
+      “: '"'
+      ”: '"'
+      „: '"'
+      •: '-'
+      …: '...'
+      −: '-'
+      ▪: '-'
+      ●: '-'
+      ◦: '-'
+      : '-'
+      ﬁ: fi
+      ﬂ: fl
+version: 1

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo so sánh hợp đồng Word ↔ PDF</title>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #eff6ff;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --danger-char: #b91c1c;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --success-char: #15803d;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: var(--gray-800);
+      background: var(--gray-50);
+      padding: 24px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 32px;
+    }
+    header {
+      border-bottom: 2px solid var(--gray-200);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 26px;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-red { background: var(--danger-bg); color: var(--danger); }
+    .badge-yellow { background: var(--warning-bg); color: var(--warning); }
+    .badge-gray { background: var(--gray-200); color: var(--gray-700); }
+    .badge-green { background: var(--success-bg); color: var(--success); }
+
+    /* Thông tin chạy & Metadata */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      padding: 16px;
+    }
+    .card h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: var(--gray-700);
+      border-bottom: 1px solid var(--gray-200);
+      padding-bottom: 6px;
+    }
+    .card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .card td {
+      padding: 4px 0;
+      vertical-align: top;
+    }
+    .card td.label {
+      width: 140px;
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+    .code-font {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      word-break: break-all;
+    }
+
+    /* Summary bar */
+    .summary-box {
+      display: flex;
+      gap: 16px;
+      background: var(--primary-light);
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .stat-red { color: var(--danger); }
+    .stat-yellow { color: var(--warning); }
+    .stat-gray { color: var(--gray-600); }
+    .stat-green { color: var(--success); }
+
+    /* Cảnh báo */
+    .alerts {
+      margin-bottom: 24px;
+    }
+    .alert {
+      background: var(--warning-bg);
+      border-left: 4px solid var(--warning);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #92400e;
+    }
+
+    /* Tables */
+    .table-section {
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    table.diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      border: 1px solid var(--gray-200);
+    }
+    table.diff-table th {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--gray-300);
+      font-weight: 600;
+    }
+    table.diff-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: top;
+    }
+    table.diff-table tr:hover {
+      background-color: #fafbfc;
+    }
+    .col-id { width: 45px; text-align: center; font-weight: 600; }
+    .col-clause { width: 120px; font-weight: 600; color: var(--primary); }
+    .col-content { width: 30%; }
+    .col-context { width: 25%; font-size: 12px; color: var(--gray-600); font-style: italic; }
+    .col-page { width: 80px; text-align: center; font-size: 13px; color: var(--gray-600); }
+
+    /* Highlight styles */
+    .diff-del {
+      background-color: var(--danger-bg);
+      text-decoration: line-through;
+      padding: 2px 4px;
+      border-radius: 3px;
+      color: var(--danger-char);
+    }
+    .diff-ins {
+      background-color: var(--success-bg);
+      text-decoration: underline;
+      padding: 2px 4px;
+      border-radius: 3px;
+      color: var(--success-char);
+    }
+    .char-del {
+      background-color: #fca5a5;
+      font-weight: 700;
+      text-decoration: line-through;
+      color: #991b1b;
+      padding: 0 1px;
+    }
+    .char-ins {
+      background-color: #86efac;
+      font-weight: 700;
+      text-decoration: underline;
+      color: #166534;
+      padding: 0 1px;
+    }
+    .text-empty {
+      color: var(--gray-300);
+      font-style: italic;
+    }
+
+    /* Details styling */
+    details {
+      background: #ffffff;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    summary {
+      padding: 12px 16px;
+      background: var(--gray-100);
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+    summary:hover {
+      background: var(--gray-200);
+    }
+    .details-body {
+      padding: 16px;
+    }
+
+    footer {
+      border-top: 1px solid var(--gray-200);
+      padding-top: 16px;
+      margin-top: 40px;
+      font-size: 13px;
+      color: var(--gray-600);
+      text-align: center;
+    }
+
+    /* Print styling */
+    @media print {
+      body {
+        padding: 0;
+        background: #ffffff;
+      }
+      .container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      details {
+        border: none;
+        margin-bottom: 20px;
+      }
+      details[open], details {
+        display: block !important;
+      }
+      summary {
+        display: none !important;
+      }
+      .details-body {
+        padding: 0;
+        display: block !important;
+      }
+      tr {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Báo cáo so sánh hợp đồng Word ↔ PDF</h1>
+      <p style="color: var(--gray-600); font-size: 14px;">Bản so sánh tự động nội dung văn bản (đã loại bỏ nhiễu kỹ thuật)</p>
+    </header>
+
+    <!-- 3. Tóm tắt -->
+    <div class="summary-box">
+      {% set red_diffs = prepared_diffs | selectattr("category", "equalto", "diff") | list %}
+      {% set yellow_diffs = prepared_diffs | selectattr("category", "equalto", "maybe_noise") | list %}
+      
+      {% if red_diffs | length == 0 and yellow_diffs | length == 0 %}
+        <div class="stat-item stat-green">
+          <span>✅ Không tìm thấy khác biệt về nội dung chữ.</span>
+        </div>
+      {% else %}
+        <div class="stat-item stat-red">
+          <span>🔴 {{ red_diffs | length }} điểm khác biệt</span>
+        </div>
+        <div class="stat-item stat-yellow">
+          <span>🟡 {{ yellow_diffs | length }} có thể là nhiễu</span>
+        </div>
+      {% endif %}
+      <div class="stat-item stat-gray">
+        <span>⚪ {{ result.filtered | length }} token đã lọc</span>
+      </div>
+    </div>
+
+    <!-- 4. Cảnh báo -->
+    {% if result.warnings %}
+    <div class="alerts">
+      {% for w in result.warnings %}
+      <div class="alert">⚠️ {{ w }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 2 & 5. Thông tin chạy & Metadata PDF -->
+    <div class="grid-2">
+      <div class="card">
+        <h2>Thông tin đối soát</h2>
+        <table>
+          <tr>
+            <td class="label">File Word:</td>
+            <td><strong>{{ word_filename }}</strong></td>
+          </tr>
+          <tr>
+            <td class="label">SHA-256 Word:</td>
+            <td class="code-font">{{ result.word_sha256 }}</td>
+          </tr>
+          <tr>
+            <td class="label">File PDF:</td>
+            <td><strong>{{ pdf_filename }}</strong></td>
+          </tr>
+          <tr>
+            <td class="label">SHA-256 PDF:</td>
+            <td class="code-font">{{ result.pdf_sha256 }}</td>
+          </tr>
+          <tr>
+            <td class="label">Thời gian chạy:</td>
+            <td>{{ result.run_at }}</td>
+          </tr>
+          <tr>
+            <td class="label">Phiên bản tool:</td>
+            <td>v{{ result.tool_version }}</td>
+          </tr>
+          <tr>
+            <td class="label">Phân biệt hoa/thường:</td>
+            <td>{{ "BẬT" if result.options.case_sensitive else "TẮT" }}</td>
+          </tr>
+          <tr>
+            <td class="label">Bộ lọc kích hoạt:</td>
+            <td>N2, N3, N4, N5, N6, N8, N9, N10, N11</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Metadata PDF (WeSign)</h2>
+        <table>
+          <tr>
+            <td class="label">Định dạng:</td>
+            <td>{{ result.pdf_meta.format }}</td>
+          </tr>
+          <tr>
+            <td class="label">Số trang:</td>
+            <td>{{ result.pdf_meta.page_count }} trang</td>
+          </tr>
+          <tr>
+            <td class="label">Ô chữ ký số:</td>
+            <td>{{ result.pdf_meta.signature_fields }} ô</td>
+          </tr>
+          <tr>
+            <td class="label">Producer:</td>
+            <td style="font-size: 11px;">{{ result.pdf_meta.producer or "(trống)" }}</td>
+          </tr>
+          <tr>
+            <td class="label">Creator:</td>
+            <td>{{ result.pdf_meta.creator or "(trống)" }}</td>
+          </tr>
+          <tr>
+            <td class="label">Ngày tạo:</td>
+            <td>{{ result.pdf_meta.creation_date or "(trống)" }}</td>
+          </tr>
+          <tr>
+            <td class="label">Ngày chỉnh sửa:</td>
+            <td>{{ result.pdf_meta.mod_date or "(trống)" }}</td>
+          </tr>
+        </table>
+        <p style="font-size: 11px; color: var(--gray-600); margin-top: 8px; font-style: italic;">
+          * Ghi chú: Metadata chỉ để tham khảo, có thể bị chỉnh sửa trong quá trình ký hoặc convert.
+        </p>
+      </div>
+    </div>
+
+    <!-- 6. Bảng khác biệt chính (🔴) -->
+    <div class="table-section">
+      <div class="section-title">
+        <span>🔴 Danh sách khác biệt chính</span>
+        <span class="badge badge-red">{{ red_diffs | length }}</span>
+      </div>
+
+      {% if red_diffs %}
+      <table class="diff-table">
+        <thead>
+          <tr>
+            <th class="col-id">#</th>
+            <th class="col-clause">Điều/khoản</th>
+            <th class="col-content">Bản Word (đã duyệt)</th>
+            <th class="col-content">Bản PDF (WeSign)</th>
+            <th class="col-context">Ngữ cảnh</th>
+            <th class="col-page">Trang W/P</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in red_diffs %}
+          <tr>
+            <td class="col-id">{{ item.id }}</td>
+            <td class="col-clause">{{ item.clause }}</td>
+            <td class="col-content">
+              {% if item.kind == "insert" %}
+                <span class="text-empty">(không có)</span>
+              {% elif item.kind == "delete" %}
+                <span class="diff-del">{{ item.word_html | safe }}</span>
+              {% else %}
+                {{ item.word_html | safe }}
+              {% endif %}
+            </td>
+            <td class="col-content">
+              {% if item.kind == "delete" %}
+                <span class="text-empty">(không có)</span>
+              {% elif item.kind == "insert" %}
+                <span class="diff-ins">{{ item.pdf_html | safe }}</span>
+              {% else %}
+                {{ item.pdf_html | safe }}
+              {% endif %}
+            </td>
+            <td class="col-context">
+              {% if item.context_before %}...{{ item.context_before }}{% endif %}
+              <strong>[...]</strong>
+              {% if item.context_after %}{{ item.context_after }}...{% endif %}
+            </td>
+            <td class="col-page">
+              {{ item.page_word or "-" }} / {{ item.page_pdf or "-" }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p style="color: var(--gray-600); font-style: italic; padding: 12px 0;">Không có điểm khác biệt nội dung nào.</p>
+      {% endif %}
+    </div>
+
+    <!-- 7. Bảng "Có thể là nhiễu" (🟡) -->
+    {% if yellow_diffs %}
+    <details>
+      <summary>
+        <span>🟡 Khác biệt có thể là nhiễu (hoán đổi vị trí đọc / N10)</span>
+        <span class="badge badge-yellow">{{ yellow_diffs | length }}</span>
+      </summary>
+      <div class="details-body">
+        <table class="diff-table">
+          <thead>
+            <tr>
+              <th class="col-id">#</th>
+              <th class="col-clause">Điều/khoản</th>
+              <th class="col-content">Bản Word</th>
+              <th class="col-content">Bản PDF</th>
+              <th>Ghi chú</th>
+              <th class="col-page">Trang W/P</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in yellow_diffs %}
+            <tr>
+              <td class="col-id">{{ item.id }}</td>
+              <td class="col-clause">{{ item.clause }}</td>
+              <td class="col-content">{{ item.word_text }}</td>
+              <td class="col-content">{{ item.pdf_text }}</td>
+              <td style="font-size: 13px; color: var(--warning);">{{ item.note }}</td>
+              <td class="col-page">{{ item.page_word or "-" }} / {{ item.page_pdf or "-" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+    {% endif %}
+
+    <!-- 8. Phụ lục "Đã lọc" (⚪) -->
+    <details>
+      <summary>
+        <span>⚪ Phụ lục: Các token đã lọc nhiễu</span>
+        <span class="badge badge-gray">{{ result.filtered | length }}</span>
+      </summary>
+      <div class="details-body">
+        <div style="margin-bottom: 16px;">
+          <strong>Thống kê theo bộ lọc:</strong>
+          {% for fid, count in result.filter_stats.items() %}
+            <span class="badge badge-gray" style="margin-left: 8px;">{{ fid }}: {{ count }}</span>
+          {% endfor %}
+        </div>
+        <table class="diff-table" style="font-size: 13px;">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Bộ lọc</th>
+              <th style="width: 80px;">Nguồn</th>
+              <th style="width: 80px;">Trang</th>
+              <th>Nội dung token</th>
+              <th>Lý do</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in result.filtered %}
+            <tr>
+              <td><span class="badge badge-gray">{{ f.filter_id }}</span></td>
+              <td>{{ f.token.source | upper }}</td>
+              <td>Trang {{ f.token.page }}</td>
+              <td class="code-font">{{ f.token.raw }}</td>
+              <td>{{ f.reason }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <!-- 9. Footer -->
+    <footer>
+      Tool chỉ hỗ trợ chỉ ra khác biệt về nội dung chữ. Không so sánh định dạng và hình ảnh. Quyết định cuối cùng thuộc về Legal.
+    </footer>
+  </div>
+</body>
+</html>
